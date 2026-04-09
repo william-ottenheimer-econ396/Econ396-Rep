@@ -28,26 +28,180 @@ plot(pressure)
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
 
+Let's talk about our data types
 
+Character - This is text we create it with quotations "text example"
 
 rm(list = ls())
 
 
+```{r}
+install.packages("tidyverse")
+library(tidyverse)
+```
 
 
 
+```{r}
+characterex <- "my name"
+
+characterex2 <- c("5")
+
+characterex3 <- c(5)
+
+multipliedcharacterex3 <- 5*characterex3
+
+multipliedcharacterex3
+
+#multipliedcharacterex2 <- 5*characterex2
+
+str(characterex2)
+str(characterex3)
+
+```
+
+print(characterex)
+
+Factor data 
+```{r}
+factordata <- c("sophmore","freshman")
+
+factordata <- as.factor(factordata)
+
+summary(factordata)
+
+```
+
+
+Integers - numbers that are 
+
+```{r}
+intershere <- c(1,3,5,6)
+
+
+intershere <- as.integer(intershere)  
+
+```
+
+
+Numeric data - this is everything including integers that is also rational and non chr
+
+```{r}
+numberline <- c(1.5,6.3,93.8)
+
+numbersasints <- as.integer(numberline)
+```
+
+Logical values - these are true or false
+
+
+```{r}
+Isthisaninteger <- is.integer(characterex)
+
+Isthisaninteger
+
+is.integer(numbersasints)
+```
+
+print(HW1 vector)
+
+the data type is numeric. 
+
+## Displacement (cc) Net Power Out (kW) Net Torque (Nm)
+## 163.00 3.60 10.30
+## Oil Capacity (l) Fuel Tank Capacity (l)
+## 0.58 3.10
+
+Make a vector with the above info
+
+
+```{r}
+### We assign the appropriate numeric data to HW1vector
+HW1Vector <- c(163.00, 3.60, 10.3,.58,3.10)
+
+### This code names the vector
+
+names(HW1Vector) <- c("Displacement (cc)","Net Power Out (kW)","Net Torque (Nm)","Oil Capacity (L)", "Fuel Tank Capacity (l)")
+
+str(HW1Vector)
+#### Validation the object is a vector
+
+is.vector(HW1Vector)
+## We validate the work here
+print(HW1Vector)
+
+Engine1 <- HW1Vector
+```
+partB
+The goal of this chunk is to write a second vector of character data
+
+```{r}
+#Engine2 <- as.character(Engine1)
+
+
+#Engine2 <- c("163.00","3.60","10.3",".58","3.1")
+names(Engine2)  <- c("Displacement (cc)","Net Power Out (kW)","Net Torque (Nm)","Oil Capacity (L)", "Fuel Tank Capacity (l)")
+
+Engine2
+```
+Family Question
+```{r}
+FamMembers <- c("Will ","Bill")
+names(FamMembers) <- c("Self","Dad")
+###Data validation check
+FamMembers
+str(FamMembers)
+
+```
 
 
 
+Question 2
+Matrix operations
+
+```{r}
+#composing Matrix data
+matinfo <- c("AA", -3.3,8.2,  "BB",-1.0,10.5 ,"CC",1.3,12.8)
 
 
+# function to create matrix
+HW1Matrix <- matrix(data = matinfo, ncol = 3 )
+
+#validate
+
+is.matrix(HW1Matrix)
+```
+```{r}
+row1 <- c("AA", "BB", "CC", "DD", "EE")
+row2 <- c(-3.3, -1.0, 1.3, 3.6, 5.9)
+row3 <- c( 8.2, 10.5, 12.8,15.1, 17.4)
+
+NewMatrix <- rbind(row1,row2,row3)
+
+#HW1Matrix <- rbind(HW1Matrix,row1,row2,row3)
+
+```
 
 
+## AA BB CC DD EE
+## [1,] -3.3 -1.0 1.3 3.6 5.9
+## [2,] 8.2 10.5 12.8 15.1 17.4
+
+```{r}
+#MatrixMathex1 <- NewMatrix*3
+
+newrow2 <- 3+row2
+NewMatrix <- rbind(row1,newrow2,row3)
+NewMatrix[2,]
+
+```
+
+```{r}
 
 
+MultipliedMatrix <- rbind(row1, 3*as.numeric(NewMatrix[2,]),row3)
 
-
-
+```
 
 
 

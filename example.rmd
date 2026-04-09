@@ -6,6 +6,8 @@ output:
 ---
 ###This is a test file for R
 
+rm(list = ls()) 
+ 
  
 Text that I put here will be
 
