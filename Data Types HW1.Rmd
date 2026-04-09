@@ -30,3 +30,85 @@ Note that the `echo = FALSE` parameter was added to the code chunk to prevent pr
 
 
 
+rm(list = ls())
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+```{r}
+
+matdata <- c("AA",-3.3,8.2,"bb",-1,10.5,"cc",1.3,12.8)
+matex2 <- matrix(data = matdata, nrow = 3, ncol = 3)
+
+
+```
+
+
+
+
+
+
+
+
+
+```{r}
+E1values <- c(163,3.6,10.30,.58,3.10)
+E1datalabels <- c("Displacement","Net Power Out","Net Torque","Oil Cap","Fuel Tank")
+#labels()
+is.vector(E1values)
+names(E1values) <- E1datalabels
+
+attributes(E1values)
+str(E1values)
+dim(E1values)
+nrow(E1values)
+length(E1values)
+```
+
+```{r}
+multe1 <- 3*E1values
+```
+
+
+
+
+
+```{r}
+hwcol <- c("AA","BB","CC")
+hwrow1 <- c(-3.3,-1.0,1.3)
+hwrow2 <- c(8.2,10.5,12.8)
+
+
+combinedv <- c(hwcol,hwrow1,hwrow2)
+HW1mat <- matrix(data = combinedv, ncol =3)
+str(HW1mat)
+```
+```{r}
+bettermat <- rbind(hwcol,hwrow1,hwrow2)
+```
+
+
+```{r}
+specificvalue <- bettermat[3,2]
+```
+
+
+

@@ -1,1 +1,32 @@
+---
+output:
+  html_document: default
+  pdf_document: default
+  title: Document title
+---
 ###This is a test file for R
+
+ 
+Text that I put here will be
+
+```{r}
+
+Object1 <- "1"
+
+number1 <- as.numeric(Object1)
+```
+```{r}
+
+### This code chunk is meant to make additional objects
+Object2 <- "Myname"
+
+Object3 <- "today's date"
+
+print(Group1)
+print(Object2,Object1)
+
+
+
+
+```
+ :) Hello World... Thank you so much for listening to this first lecture
