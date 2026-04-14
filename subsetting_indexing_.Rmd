@@ -1,6 +1,6 @@
 ---
 title: "Introduction to dataframes, subsetting and addressing"
-subtitle: "Data in R, Fall 2022"
+subtitle: "subtitle here"
 output:
   pdf_document: default
   html_document: default
