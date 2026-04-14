@@ -1,0 +1,10 @@
+---
+title: "Homework about Indexing and Subsets"
+subtitle: "Always ask Will if you need help"
+output:
+  pdf_document: default
+  html_document: default
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
