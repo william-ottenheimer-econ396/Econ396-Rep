@@ -10,6 +10,16 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+```{r}
+#install.packages("tinytext")
+#tinytex::install_tinytex()
+```
+
+```{r}
+#rm(list = ls())
+```
+
+
 # Factors
 
 **Factors** and **ordered factors** are similar to vectors, but contain categorical data. R handles factors differently than vectors, so a factor is more than vector with a different type of data.
@@ -21,6 +31,7 @@ The **as.factor** function can be used to create a factor from a vector. We can 
 # convert character vector to factor
 grades <- c("A", "B", "C", "F", "B", "A", "C", "C", "C", "B", "B", "B", "B", "A", "C", "B", "A", "F")
 grades
+
 
 cat("\nnow create a factor:\n")
 grades_fact <- factor(grades)
@@ -49,7 +60,18 @@ cat("\nattributes\n") # blank line
 attributes(grades_ord)
 ```
 
-THe order by default is alphabetical, but we probably want A > B > C > F. Also notice that there is no "D" grade. The factor function just works with the levels given. To fix these problems we can set the levels.
+```{r}
+agreaterthanb <- grades[1] > grades[2]
+agreaterthanb
+agreaterthanb <- grades_fact[1] > grades_fact[2]
+agreaterthanb
+agreaterthanb <- grades_ord[1] < grades_ord[2]
+agreaterthanb
+```
+
+
+
+The order by default is alphabetical, but we probably want A > B > C > F. Also notice that there is no "D" grade. The factor function just works with the levels given. To fix these problems we can set the levels.
 ```{r ordered factor chr 2}
 # set ordered=T to create an ordered factor
 grades_ord2 <- factor(grades, ordered = T, levels = c("F", "D", "C", "B", "A"))
@@ -59,6 +81,8 @@ str(grades_ord2)
 cat("\nattributes\n") # blank line
 attributes(grades_ord2)
 ```
+
+
 
 Notice that we now have a "D" level even though there are no D grades in the ordered factor.
 
@@ -122,7 +146,12 @@ students <- data.frame(name, gender, age, height, grade)
 str(students)
 students
 
+
 head(students)
+
+students$height <- students$height + 1
+head(students)
+
 ```
 
 # column names
@@ -136,12 +165,19 @@ Data frame column names are generally variable names. You can designate column n
 students <- data.frame(first.name = name, gender, c(18, 23, 48, 19), height, grade)
 students
 ```
+```{r}
+library(tidyverse)
+```
+
 
 We can designate the third column name as *age* using the following approach.
 ```{r data.frame colnames 2}
 # This time set stringsAsFactors=F
 students <- data.frame(first.name = name, gender, age = c(18, 23, 48, 19), height, grade, stringsAsFactors = F)
 students
+
+#students$President <-  if_else(students$age > 35, TRUE,FALSE)
+
 ```
 
 ## Designate column names with colnames()
@@ -155,7 +191,7 @@ colnames(students)
 We can also assign column names of a data frame using the **colnames** function.
 ```{r colnames() 2}
 # assign column names using colnames() function
-colnames(students) <- c("First.name", "Gender", "Age", "Height", "Grade")
+colnames(students) <- c("First.name", "Gender", "Age", "Height", "Grade", "President Eligible")
 students
 ```
 
@@ -170,6 +206,8 @@ Change data type for one column by name.
 ```{r manipulate column by name}
 students$Age <- as.integer(students$Age)
 students
+
+
 ```
 
 Note that we normally wouldn't designate **Age** as an integer. Even though our Age values are all integers, we know that Age is a continuous variable.
@@ -199,6 +237,11 @@ vect[c(-4)]
 cat("\nextract everything except positions 2,3,4  -c(2:4)\n")
 vect[-c(2:4)]
 ```
+
+```{r}
+students[1,1]
+```
+
 
 Notice that we extract **values** held at the addressed positions in the vector data object.
 
@@ -433,6 +476,8 @@ mat3 <- mat
 mat3[2, 3] <- 0
 mat3
 
+mat2 <- mat
+
 cat("\nassign 99 to 2nd column\n")
 mat3 <- mat2
 mat3[, 2] <- 99
@@ -618,3 +663,9 @@ students[order(students$grade, decreasing = T), ]
 # sort by gender, then age
 students[order(students$gender, students$age), ]
 ```
+
+```{r}
+library(tidyverse)
+```
+
+

@@ -8,3 +8,122 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+
+
+```{r}
+
+```
+
+```{r}
+#rm(list = ls())
+```
+[1] “apples” “wheat” “soybeans” “potatoes” “grapes” “cherries” “almonds” “hay”
+[9] “hops
+#Homework Begin
+Create a crop vector
+```{r}
+#Make the vector
+
+crops <- c("apples","wheat","soybeans","potatoes","grapes","cherries","almonds","hay","hops")
+replacementcrops <- crops
+
+replacementcrops[3] <- "Oranges"
+
+WAcropswvector <- crops[c(1,5,6,2,9,8)]
+
+WAcropswlogic <- c(TRUE,TRUE,FALSE,TRUE,TRUE,TRUE,FALSE,TRUE,TRUE)
+
+Samevectorasabove <- crops[WAcropswlogic]
+
+
+order(WAcropswvector)
+order(sort(WAcropswvector))
+
+print(sort(WAcropswvector))
+
+```
+
+These are WA crops fyi: apples” “grapes” “cherries” “potatoes” “hops” “wheat” “hay”
+
+
+#Homework Q 2
+
+```{r}
+matdata <- c(1:20)
+q2mat <- matrix(data = matdata, ncol = 5, nrow = 4, byrow = TRUE)
+
+```
+
+
+```{r}
+just45 <- c(q2mat[1,4],q2mat[1,5])
+just45
+```
+```{r}
+norow3 <- q2mat[-3,]
+norow3
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
