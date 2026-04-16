@@ -17,6 +17,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r}
 #rm(list = ls())
 ```
+
 [1] “apples” “wheat” “soybeans” “potatoes” “grapes” “cherries” “almonds” “hay”
 [9] “hops
 #Homework Begin
@@ -65,18 +66,163 @@ norow3
 ```
 
 
+Let's Talk About Lists
+
+
+
+Matrix can only hold 1 atomic data type so 
+we need another data structure - Lists can hold different types and objects
+
+We use the List Function
+
+```{r}
+vect1 <- c(1:3)
+vect2 <- c("Central","Washington","University")
+listexample <- list(vect1,vect2)
+```
+
+
+
+We can even put other lists or a matrix... other multidimensional objects
+
+```{r}
+Matex <- matrix(data = c(1:5),nrow = 3)
+
+listexample$object3 <- Matex
+
+listexample
+```
+
+
+
+```{r}
+names(listexample) <- c("text","numbers","multi")
+```
+
+
+```{r}
+listexample[1] <- c("Soils 502")
+
+listexample
+```
+
+```{r}
+listexample[1:2]
+```
+Double Index
+
+```{r}
+listexample[[2]][2]
+```
+
+
+
+To remove we do index assignment and give it Null
+
+```{r}
+
+listexample[3] <- NULL
+
+listexample$object3 <- Matex
+
+```
+
+```{r}
+secondlist <- list(c("Go"),c("Wildcats"))
+
+listexample[[6]] <- secondlist
+```
+
+
+Lists are a good introduction to working with Data frames :)
+
+
+
+#CBIND
+&
+#RBIND
+
+
+```{r}
+### Homework data
+##[1] 3 5 6 12
+##
+## [1] TRUE FALSE TRUE TRUE
+##
+## [1] "A" "B" "C" "D" "E"
+##
+## [,1] [,2] [,3] [,4] [,5]
+## [1,] 2 14 26 5 17
+## [2,] 5 17 29 8 20
+## [3,] 8 20 32 11 23
+## [4,] 11 23 2 14 26
+##
+## [,1] [,2] [,3] [,4]
+## [1,] 1 -1 1 0
+## [2,] 0 0 -1 1
+```
 
 
 
 
 
 
+```{r}
+Q4vect1 <- c(3, 5, 6, 12)
+
+Q4vect2 <- c(TRUE,FALSE,TRUE,FALSE)
+
+Q4vect3 <- c("Mary","Had A","Little","Lamb")
+
+matrow1 <- c(2, 14, 26, 5, 17)
+matrow2 <- c(5, 17, 29, 8, 20)
+matrwow3 <- c(8,20,32,11,23)
+matrow4 <- c(11,23,2,14,26)
 
 
 
+Q4mat1 <- matrix(data = rbind(matrow1,matrow2,matrwow3,matrow4),nrow = 4 )
+
+```
 
 
+cbind time
 
+```{r}
+v2 <- cbind(Q4vect1,Q4vect2)
+
+v2
+```
+
+```{r}
+v3 <- cbind(Q4vect3,Q4vect2)
+v3
+```
+```{r}
+result <- cbind(Q4mat1,Q4vect1)
+result
+result <- cbind(Q4vect1,Q4mat1)
+result
+```
+Rbind
+
+```{r}
+#producing the data object from Q4 part c
+result <- rbind(Q4mat1,Q4vect1)
+result
+result <- rbind(Q4vect1,Q4mat1)
+result
+```
+
+
+```{r}
+rbindexample <- rbind(v2,v3)
+rbindexample
+
+print("second example")
+rbindexample <- rbind(rbindexample,rbindexample)
+rbindexample
+```
 
 
 
