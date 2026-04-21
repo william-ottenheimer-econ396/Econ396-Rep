@@ -1,0 +1,751 @@
+---
+title: "Data Import and Export and Advanced Subsetting and Addressing"
+subtitle: "Data in R, Spring 2026"
+output:
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+
+###
+knitr::opts_knit$set(root.dir = "C://Users//ottenheimew//Documents//Econ396-Rep//ex directory")
+```
+
+#Working Directories
+
+
+
+Use getwd and setwd
+setwd must contain a file path
+
+```{r}
+getwd()
+```
+
+
+```{r}
+#setwd("C://Users//ottenheimew//Documents//Econ396-Rep//ex directory")
+
+write.csv2(1:9, "C:\\Users\\ottenheimew\\Documents\\Econ396-Rep\\ex directory\\subsetfolder\\filename3.csv")
+```
+
+
+
+# Import & Export - Intro
+
+The two R functions commonly used to read external data into data frames are **read.table** and **read.csv**. Each of these has a paired function that writes data frames to an external data file, **write.table** and **write.csv**.
+
+## write.table
+
+We can create a dataframe with student information.
+```{r create students dataframe}
+name <- c("Matt", "Sid", "Sienna", "Heather")
+gender <- factor(c("F","M","F","M"))
+age <- c(18,23,48,19)
+height <- c(60,70,65,72)
+grade <- factor(c("A", "D", "B","C"), levels=c("F","D","C","B","A"), ordered=T)
+
+# Now put these vectors into a data frame.
+students <- data.frame(name, gender, age, height, grade,stringsAsFactors=F)
+students
+row.names(students)
+str(students)
+```
+
+Now we can export this to an operating system file outside the R environment using **write.table()**.
+```{r students write.table}
+# the write.table command writes an R data frame out to an external data file.
+# in this case we separate with a tab (tab-delimited)
+# row names are not exported, we normally don't want these
+# quotes are turned off
+write.table(students, "students.txt", sep="\t", row.names=F, quote=F)
+```
+
+
+## read.table()
+
+Now we can read this data into R using **read.table**.
+```{r read.table}
+# By default, read.table recognizes many different separators
+#       spaces, tabs, newlines or carriage returns
+# header=T tells R that the first row contains column names
+students <- read.table("students.txt", header=T)
+students
+str(students)
+```
+
+
+
+The variable **gender** was read in as a character, we can coerce to factor with the following code. 
+```{r eval = FALSE}
+students$gender = as.factor(students$gender)
+students
+str(students)
+```
+
+Notice that grade is NOT a factor. 
+
+```{r fix grade}
+# By default, read.table recognizes many different separators
+students$grade <-as.factor(students$grade)
+str(students)
+
+# Is there a problem? How will you fix it?
+
+```
+
+Now try this. Is there an issue? How will you fix it?
+
+```{r read and write check}
+name <- c("Matt Baker", "Sid Chaudhary", "Sienna Yourek", "Heather Wood")
+gender <- factor(c("F","M","F","M"))
+age <- c(18,23,48,19)
+height <- c(60,70,65,72)
+grade <- factor(c("A", "D", "B","C"), levels=c("F","D","C","B","A"), ordered=T)
+# Now put these vectors into a data frame
+students <- data.frame(name, gender, age, height, grade,stringsAsFactors=F)
+# Now write the data
+write.table(students, "students.txt", sep="\t", row.names=F, quote=F)
+# Now read the data. What happens?
+students <- read.table("students.txt")
+students
+
+```
+
+## read.csv, write.csv
+
+Now we can repeat the excercise above using **read.csv** and **write.csv**.
+```{r write.csv}
+# the write.csv function writes an R data frame out to an external csv data file.
+# row names are not exported
+# quotes are turned off
+name <- c("Matt", "Sid", "Sienna", "Heather")
+students <- data.frame(name, gender, age, height, grade,stringsAsFactors=F)
+
+write.csv(students, "students.csv", row.names=F, quote=F) 
+```
+
+Now we can read this data into R using **read.csv**.
+```{r read.csv}
+# read.csv handles row names and column names automatically
+students <- read.csv("students.csv", stringsAsFactors = F)
+students
+```
+
+Notice that **name** is now a character variable as desired, but **gender** is also a character vector when we want it to be a factor.
+
+In general, it is convenient to work with csv files as they provide efficient data storage and can be recognized by many software packages.
+
+## Datasets on the internet 
+
+It is easy to read in data from the internet. Simply provide the URL address where you would normally put the file name for **read.table** or **read.csv**. We will also introduce the**head** and **summary** commands to help look at a larger data frame.
+
+```{r read.table wine}
+wine <- read.table('http://archive.ics.uci.edu/ml/machine-learning-databases/wine/wine.data',sep=",")
+head(wine)  # head function looks at the first six rows
+```
+
+In this case, the data provided includes no varible names. We can find the variable names and data description at:  archive.ics.uci.edu/ml/machine-learning-databases/wine/wine.names.
+
+We need to add to add the variable names and set the first variable as a factor (wine class = 1, 2, or 3).
+
+```{r modify wine}
+colnames(wine) <- c("class","alcohol","malic.acid","ash","alkalinity.ash","mg","tot.phenol","flavanoids","nonflav.phenol","proanthocyanins","col.intensity","hue","OD280.OD315","proline")
+wine$class<-as.factor(wine$class)
+head(wine)
+summary(wine)
+```
+
+We can see that the wine data is separated by commas. Can we import with **read.csv**?
+```{r read.csv wine}
+# note that we don't include the sep parameter for read.csv
+wine <- read.csv('http://archive.ics.uci.edu/ml/machine-learning-databases/wine/wine.data')
+head(wine)  # head function looks at the first six rows
+
+```
+
+The **read.csv** function expects a header row, so the first row of data are turned into headers.
+
+We can rerun this with header=F to import the data properly. Then we would still need to label the columns and turn the first variable into a factor as before.
+```{r read.csv wine 2}
+# note that we don't include the sep parameter for read.csv
+wine <- read.csv('http://archive.ics.uci.edu/ml/machine-learning-databases/wine/wine.data', header=F)
+head(wine)  # head function looks at the first six rows
+```
+
+**Notes**
+
+* If data is separated by commas, you can use read.table or read.csv. Otherwise, read.table is the more general function.
+* Just about any common data file can be imported in R, either using a base function or a specialized package. THis would include spatial data, image files, excel files, etc...
+* R isn't designed for internal data storage. Import data, work on it, then export processed data for external storage. Or increasingly, you can work in R on data that is stored and managed elsewhere (the data is never actually imported into the R environment but through various front end packages data objects can be created that reference external data.)
+
+# Lists in R
+
+Lists are ubiquitous in R, and the most challenging kind of data object to master. Think of a list as a special kind of vector where every element is a data object rather than a value (e.g. vector, factor, matrix, dataframe). You can even have lists within lists!
+
+Many functions generate results in the form of a list. For example, when you run a regression model, the results (r squared, predictor significance, coefficients, etc..) will be combined into a list with a specific format that other functions can recognize.
+
+## create lists
+
+WE can create a list with the **list()** function.
+```{r list function 1}
+# we can construct a list by stringing together multiple objects
+a = c(2, 3, 5) 
+b = c("aa", "bb", "cc", "dd", "ee") 
+c = c(T, F, T, F, F)
+my_list = list(a, b, c, 3)   # contains copies of a, b, c
+my_list
+
+cat("\nstructure of my_list\n")
+str(my_list)
+```
+
+Notice:
+
+* A list may include different data types.
+* Each position within a list is noted with double brackets [[]].
+
+We can also name elements in a list.
+```{r list function 2}
+my_list = list(a=c(2,3,5), b=c("aa","bb","cc","dd","ee"),c=c(T,F,T,F,F), d=3)  
+my_list
+
+cat("\nstructure of my_list\n")
+str(my_list)
+
+cat("\nnames(my_list)\n")
+names(my_list)
+
+cat("\nyou are kidding right\n")
+names(my_list) <- c("you","are","kidding","right")
+str(my_list)
+```
+
+A list item can be a matrix, dataframe, array, etc...
+```{r list function 3}
+my_list = list(a=c(2,3,5), b=c("aa","bb","cc","dd","ee"), c=c(T,F,T,F,F), d=matrix(seq(1:6),2,3)) 
+# readability
+my_list = list(a = c(2,3,5), 
+               b = c("aa","bb","cc","dd","ee"), 
+               c = c(T,F,T,F,F),
+               d = matrix(seq(1:6),2,3)) 
+
+my_list
+
+cat("\nstructure of my_list\n")
+str(my_list)
+```
+
+
+## List within a list
+
+Another example, with a list within a list.
+```{r list within list}
+children <- list(names=c("Leila","Elsina"),ages=c(15,12))
+children
+
+dave_list <- list(name="dave", job="prof", children=children)
+dave_list
+
+cat("\nagain\n")
+dave_list_list <- list(name="dave", 
+                       job="prof",
+                       children=list(names=c("Leila","Elsina"),
+                                     ages=c(15,12)))
+dave_list_list
+
+str(dave_list_list)
+```
+
+
+```{r list within list nonames}
+dave_list <- list("dave", "prof", list(c("Leila","Elsina"),c(13,10)))
+dave_list
+
+str(dave_list)
+```
+
+## complex lists to organize function outputs
+
+We can generate and examine the output data object from a simple regression.
+```{r lm output object}
+# generate and examine data
+x <- seq(1:30)
+y <- 2*seq(1:30)+rnorm(n=30,mean=0,sd=2)
+plot(x,y)
+
+# regression with result in xy.lm
+xy_lm <- lm(y~x)
+xy_lm
+
+cat("\nnow look at str(xy_lm)\n")
+str(xy_lm)
+
+
+```
+
+When a regression model output *lm* object has been created, different R functions know how to handle and use this object.
+```{r lm output object 2}
+cat("\nDifferent functions know how to handle this complex object, structured in a list\n")
+
+cat("\nclass(xy.lm)------------------------------\n")
+class(xy_lm)
+
+cat("\nsummary(xy.lm)----------------------------\n")
+summary(xy_lm)
+
+plot(xy_lm)
+```
+
+# Lists - addressing
+
+Lists are addressed just like vectors, though it can get more complicated as the items *within* a list can also be addressed.
+
+## Single bracket extraction
+
+### Simple list
+
+We can use single brackets **[]** to obtain subsets of this list.
+```{r simple list subsets 1a}
+my_list = list(a=c(2,3,5),b=c("aa","bb","cc","dd","ee"),c=c(T,F,T,F,F), d=3)  
+my_list
+
+cat("\n> my_list[2]\n\n")
+my_list[2]
+
+cat("\n> str(my.list1[2])\n\n")
+str(my_list[2])
+```
+
+```{r simple list subsets 1b}
+my_list[2:4]
+```
+
+```{r simple list subsets 1c}
+my_list[-3]
+```
+
+```{r simple list subsets 1d}
+my_list[c(T,F,F,T)]
+```
+
+### extracting from more complex list
+
+Repeat **[]** subsetting with more complex list.
+```{r simple list subsets 2a}
+dave_list <- list(name="dave", job="prof", children=list(names=c("Leila","Elsina"),ages=c(15,12)))
+dave_list
+
+cat("> dave_list[2]\n\n")
+dave_list[2]
+dave_list$job
+```
+
+Notice that even when extracting a single value, it is still considered a list. *prof* is the single value in a vector within at list with one element *job*.
+
+More examples
+```{r simple list subsets 2b}
+
+cat("> dave_list[3]\n\n")
+dave_list[3]
+
+cat("> dave_list[-2]\n\n")
+dave_list[-2]
+
+cat("> dave_list[c(T,F,T)]\n\n")
+dave_list[c(T,F,T)]
+```
+All of these results are lists.
+
+## Double bracket extraction
+
+The result of subsetting using a single bracket **[]** is always a list, even if you are extracting a single vector element. If you want to extract the element outside of a list, use double brackets **[[]]**.
+
+```{r list double brackets 1}
+my_list  # print for comparison
+
+cat("\n> my_list[2]\n\n")
+my_list[2]
+
+cat("> str(my_list[2])\n\n")
+str(my_list[2])
+
+cat("\n\n> my_list[[2]]\n\n")
+my_list[[2]]
+
+cat("\n> str(my_list[[2]])\n\n")
+str(my_list[[2]])
+```
+
+Double brackets for first list, 1st item.
+```{r list double brackets 2a}
+dave_list  # print for comparison
+
+cat("##### Single bracket []\n\n")
+cat("> dave.list[1]\n\n")
+dave_list[1]
+cat("\n> str(dave.list[1])\n\n")
+str(dave_list[1])
+
+cat("\n\n##### Double bracket []\n\n")
+cat("> dave.list[[1]]\n\n")
+dave_list[[1]]
+cat("\n> str(dave_list[[1]])\n\n")
+str(dave_list[[1]])
+```
+
+Double brackets for third list
+```{r list double brackets 2b}
+dave_list  # print for comparison
+
+cat("##### Single bracket []\n\n")
+cat("> dave.list[3]\n\n")
+dave_list[3]
+cat("> str(dave_list[3])\n\n")
+str(dave_list[3])
+
+cat("\n\n##### Double bracket []\n\n")
+cat("> dave_list[[3]]\n\n")
+dave_list[[3]]
+cat("> str(dave.list[[3]])\n\n")
+str(dave_list[[3]])
+```
+
+## $ addressing similar to [[]]
+
+You can also use the **$** symbol for named lists and get an equivalent result to double brackets.
+```{r list dollar sign}
+dave_list  # print for comparison
+
+cat("> dave_list$name\n\n")
+dave_list$name
+
+cat("\n> dave_list$children\n\n")
+dave_list$children
+```
+
+## burrowing down into a list
+
+We can address specific data locations within elements of a list, or a list within a list, etc...
+```{r list burrow down my.list1}
+my_list  # print for comparison
+
+#extract third position from 2nd element of list
+cat("\n> my.list1[[2]][3]\n")
+my_list[[2]][3]
+
+#This also works
+cat("\n> my.list1$b[3]\n")
+my_list$b[3]
+
+#Single brackets do NOT work for burrowing down
+cat("\n> my.list1[2][3]\n")
+my_list[2][3]
+```
+
+The last expression looks for the third element in the *list* extracted by my.list1[2], and there is no third element!
+
+Now we can repeat for our second example.
+```{r list burrow down dave_list}
+dave_list  # print for comparison
+
+cat("\n> my_list[[3]][1]\n")
+dave_list[[3]][1]
+
+str(dave_list[[3]][1])
+
+cat("\n> dave_list[[3]][[1]]\n")
+dave_list[[3]][[1]]
+str(dave_list[[3]][[1]])
+
+cat("\n> dave_list[[3]][[1]][2]\n")
+dave_list[[3]][[1]][2]
+
+cat("\n> dave.list$children$names[2]\n")
+dave_list$children$names[2]
+```
+
+## List addressing to replace values
+
+We need to address a value location to insert a value.
+```{r list burrow down dave.list replace 1}
+dave_list2 <- dave_list  
+dave_list2      # print for comparison
+
+cat("\n> dave_list2[[1]][1] <- 'David'\n")
+dave_list2[[1]][1] <- 'David'
+dave_list2
+```
+
+We can burrow down to replace.
+```{r list burrow down dave.list replace 2}
+dave_list2 <- dave_list  
+dave_list2      # print for comparison
+
+cat("\n> dave_list2[[3]][[1]][2] <- 'Elsie'\n")
+dave_list2[[3]][[1]][2] <- 'Elsie'
+dave_list2
+```
+
+It is easy to make a mistake in addressing a list, so we often prefer to use names.
+```{r list burrow down dave.list replace 3}
+dave_list2 <- dave_list  
+dave_list2      # print for comparison
+
+cat("\n> dave.list2$children$names[1] <- 'Layla'\n")
+dave_list2$children$names[1] <- 'Layla'
+dave_list2
+```
+
+
+##cbind() and rbind() dataframes
+
+The **cbind()** function operates slightly differently for dataframes.
+
+Let's recreate the student dataframe discussed previously.
+```{r student dataframe cbind 1}
+name <- c("Leila", "Vijay", "Shira", "Behrooz")
+gender <- factor(c("F","M","F","M"))
+age <- c(18,23,48,19)
+height <- c(60,70,65,72)
+grade <- factor(c("A", "D", "B","C"), levels=c("F","D","C","B","A"), ordered=T)
+
+# Now put all of these factors and vectors of same length into a data frame.
+students <- data.frame(name, gender, age, height, grade)
+students
+```
+
+Now let's add a variable for major.
+```{r student dataframe cbind2}
+
+cbind(students,c("soil sci", "hort", "econ", "entomology"))
+
+cbind(students,major = c("soil sci", "hort", "econ", "entomology"))
+
+```
+
+Now let's examine the difference between the cbind and data.frame functions.
+```{r student dataframe cbind3}
+
+major <- c("soil sci", "hort", "econ", "entomology")
+
+cbind(students,major)
+
+data.frame(students,major)
+
+# cbind applied to dataframes is really just a wrapper function for data.frame. 
+# You are better off using data.frame due to greater functionality.
+```
+
+It is good practice to use data.frame instead of cbind to join columns of data in data frames.
+
+We can also use rbind() with data frames to add rows (observations).
+```{r student dataframe rbind1}
+students <- data.frame(name, gender, age, height, grade)
+students
+
+students2 <- data.frame(name="Bob", gender="M", age=22, height=69, grade=factor(c("F"), levels=c("F","D","C","B","A"), ordered=T))
+students2
+
+rbind(students, students2)
+```
+
+Be careful about how R will coerce data if the data types in a given column don't match.
+```{r student dataframe rbind2}
+
+students2 <- data.frame(name="Bob", gender="M", age=22, height=69,grade="F")
+students2
+
+rbind(students, students2)
+str(rbind(students, students2))
+```
+
+In this case, R converted the character "F" in *student2* to the ordinal value "F" in the first dataframe.
+
+What happens if column names don't match?
+```{r student dataframe rbind3}
+
+# notice Age is capitalized for students2 vs lower case for students.
+students2 <- data.frame(name="Bob", gender="M", age=22, height=69, grade="F")
+students2
+
+rbind(students, students2)
+```
+
+# Advanced addressing - dataframes
+
+read wine
+```{r read wine}
+wine.dat <- read.csv('http://archive.ics.uci.edu/ml/machine-learning-databases/wine/wine.data',header=F)
+colnames(wine.dat) <- c("class","alcohol","malic.acid","ash","alkalinity.ash","mg","tot.phenol","flavanoids","nonflav.phenol","proanthocyanins","col.intensity","hue","OD280.OD315","proline")
+wine.dat$class<-as.factor(wine.dat$class)
+summary(wine.dat)
+str(wine.dat)
+```
+
+Now get subset with proline < 1500.
+
+```{r}
+wine.dat2 <- wine.dat[wine.dat$proline < 1500, ]
+summary(wine.dat2)
+```
+
+How do we select class == 1?
+```{r eval=FALSE}
+wine.dat3 <- wine.dat[wine.dat$class==1,]
+summary(wine.dat3$class)
+
+cat("\n")
+wine.dat7 <- wine.dat[wine.dat$class=="1",]
+summary(wine.dat3$class)
+
+cat("\n")
+wine.dat3 <- wine.dat[wine.dat$class==factor("1", levels=c("1","2","3")),]
+summary(wine.dat3$class)
+
+cat("\n")
+#wine.dat3 <- wine.dat[wine.dat$class==factor("1"),]
+#summary(wine.dat3$class)
+
+```
+
+## unique or duplicated vector values
+
+The unique() and duplicated() functions are often useful.
+```{r vectors unique duplicated}
+vect1 <- c(0,1,1,2,1,3,4)
+vect1
+
+#which positions are duplicated?
+cat("\nduplicated positions\n")
+duplicated(vect1)
+
+
+#remove duplicated positions
+cat("\nremove duplicated positions\n")
+vect1[!duplicated(vect1)]
+
+# can also be accomplished with unique()
+cat("\nunique values\n")
+unique(vect1)
+```
+
+These functions can be extended to dataframes.
+
+## unique or duplicated rows
+
+Create students dataframe with duplicate rows.
+```{r}
+name <- c("Leila", "Vijay", "Shira", "Behrooz")
+gender <- factor(c("F","M","F","M"))
+age <- c(18,23,48,19)
+height <- c(60,70,65,72)
+grade <- factor(c("A", "D", "B","C"), levels=c("F","D","C","B","A"), ordered=T)
+students <- data.frame(name, gender, age, height, grade)
+students2 <- rbind(students,students[2,])
+students2
+```
+
+Now apply duplicates, unique. Note that these are applied by default to entire rows.
+```{r dataframe dup unique}
+# duplicated is applied row-wise to dataframes
+
+cat("\nduplicated rows in students2\n")
+duplicated(students2)
+
+# remove duplicated rows in students2
+students2[!duplicated(students2),]
+
+# select unique rows in students2
+unique(students2)
+```
+
+Where duplicated() comes in useful is when you are only concerned about duplicates in certain columns of a dataframe, and want to remove rows where those columns are duplicated.
+```{r dataframe dup unique 2}
+#duplicated is applied row-wise to dataframes
+students3 <- students2
+students3$grade[2] <- "C"
+students3
+
+cat("\nduplicated rows in students3[,1:4]\n")
+duplicated(students3[,1:4])
+
+# remove duplicated rows in students3
+students3[!duplicated(students3[,1:4]),]
+
+#unique rows in students3
+unique(students3)
+
+#unique rows in unique(students3[,1:4])
+unique(students3[,1:4])
+```
+
+Duplicated removes the row where the first four columns are duplicated, whereas unique can only be applied to an entire row.
+
+##merge()
+
+We can use the merge() function to join two data frames connected by one or more index columns. This will be addressed in greater depth in data wrangling.
+```{r student dataframe cbind}
+students3
+
+name2 <- c("Leila","Vijay","Bob","Behrooz")
+major <- c("soils","hort","plant path","econ")
+students.m <- data.frame(name=name2,major)
+students.m
+
+#default merge, assume index columns have same names (name column)
+mergedstudents<- merge(students3,students.m)
+
+#change merge parameters. all.x keep all x dataframe rows? all.y keep all y dataframe rows? Sort result?
+newmergedstud <- merge(students3,students.m, all.x=T, all.y=F, sort=F)
+```
+
+#Addressing data in functions
+
+There are multiple ways to use data in a function.
+
+First let's create a dataframe to use as an example.
+```{r create dataframe}
+mydat <- data.frame(x.var=c(1,5,7,9, 10),y.var=c(2,10,20,90,85))
+mydat
+```
+
+##explicitly address all variables
+
+plot variables addressed.
+```{r data explicit}
+lm(mydat$y.var ~ mydat$x.var)
+plot(mydat$x.var, mydat$y.var)
+```
+
+plot variables addressed with column indexing
+```{r}
+mydat[,1]
+lm(mydat[,2] ~ mydat[,1])
+plot(mydat[,1], mydat[,2])
+```
+
+Plot with data =
+  ```{r data equals}
+#lm(y.var ~x.var)
+#lm(y.var~x.var, data=mydat)
+#plot(x.var, y.var, data=mydat)
+```
+
+Doesn't work for all functions.
+
+Use with() function.
+```{r with}
+with(mydat, lm(y.var ~x.var))
+with(mydat, plot(x.var, y.var))
+```
+
+Use attach data (warning, be careful, detach after use).
+```{r attach}
+attach(mydat)
+lm(y.var ~x.var)
+plot(x.var, y.var)
+detach(mydat)
+```
