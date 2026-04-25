@@ -14,3 +14,137 @@ knitr::opts_chunk$set(echo = TRUE)
 This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
 
 When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r}
+library(tidyverse)
+```
+
+
+Question 1
+
+
+```{r}
+irisdata <- read.csv("https://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data", header = FALSE)
+```
+
+
+Name the columns
+
+```{r}
+
+#rename columns based on metadata
+
+names(irisdata) <- c("sepalL","sepalW","petalL","petalw","class")
+```
+
+7. Attribute Information:
+   1. sepal length in cm
+   2. sepal width in cm
+   3. petal length in cm
+   4. petal width in cm
+   5. class: 
+      -- Iris Setosa
+      -- Iris Versicolour
+      -- Iris Virginica
+```{r}
+### summarizes everything and gives the correct data type
+
+irisdata$class <- as.factor(irisdata$class)
+
+str(irisdata)
+summary(irisdata)
+head(irisdata)
+
+```
+
+
+```{r}
+summary(irisdata$class)
+
+versidata <- subset(irisdata, irisdata$class == "Iris-versicolor")
+
+summary(versidata)
+summary(othersubset)
+```
+
+
+```{r}
+othersubset <- subset(irisdata, irisdata$class == "Iris-setosa" | irisdata$class == "Iris-virginica")
+
+```
+
+
+Answer the question
+
+Hmm it seems like the type of plant influences it's petal length.... viriginica might have the smallest petals..
+
+
+
+
+Question 2
+
+```{r}
+cardata <- read.csv("C:\\Users\\ottenheimew\\Documents\\Econ396-Rep\\Homework Data\\car.csv")
+```
+
+
+```{r}
+head(cardata)
+
+glimpse(cardata)
+view(cardata)
+```
+
+
+
+```{r}
+#print(cardata)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+```{r}
+ssdata <- subset(irisdata, irisdata$class == "Iris-versicolor")
+
+
+Versicolordata
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

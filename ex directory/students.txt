@@ -1,0 +1,5 @@
+name	gender	age	height	grade
+Matt Baker	F	18	60	A
+Sid Chaudhary	M	23	70	D
+Sienna Yourek	F	48	65	B
+Heather Wood	M	19	72	C
