@@ -23,6 +23,15 @@ library(tidyverse)
 Question 1
 
 
+### check that link works
+```{r}
+
+ecolidata <- read.csv("https://archive.ics.uci.edu/ml/machine-learning-databases/ecoli/ecoli.data", header = FALSE)
+```
+```
+
+
+
 ```{r}
 irisdata <- read.csv("https://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data", header = FALSE)
 ```
@@ -84,6 +93,7 @@ Hmm it seems like the type of plant influences it's petal length.... viriginica 
 Question 2
 
 ```{r}
+### retrieve data
 cardata <- read.csv("C:\\Users\\ottenheimew\\Documents\\Econ396-Rep\\Homework Data\\car.csv")
 ```
 
@@ -101,39 +111,66 @@ view(cardata)
 #print(cardata)
 ```
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+### Question 3 {.tabset}
 
 
 
 
 ```{r}
-ssdata <- subset(irisdata, irisdata$class == "Iris-versicolor")
+
+examplefunction <- function(flowerstat1, flowerstat2) {
+  lengthtotal <- flowerstat1 + flowerstat2
+  return(lengthtotal)
+}
 
 
-Versicolordata
+irisdata$Lengthsum <- examplefunction(irisdata$sepalL,irisdata$petalL)
+```
+
+(𝑦 ― 𝑄3) > 1.5 ∗ 𝐼𝑄𝑅 OR (𝑄1 ― 𝑦) > 1.5 ∗ 𝐼𝑄𝑅
+
+```{r}
+### IMPORTANT THIS FUNCTION NEEDS TIDYVERSE
+###library(tidyverse)
+### Trim function
+### Remove data that is above or below the 1.5 * IQR
+
+#print(quantile(irisdata$sepalW))
+#print(IQR(irisdata$sepalW))
+
+irisdata$SWQ1 <- quantile(irisdata$sepalW,probs =  .25)
+
+trim.CV <- function(dataset,flower) {
+  ### this finds the Q 1
+  Q1 <- quantile(flower, probs = .25)
+  ### this finds the Q 3
+  Q3 <- quantile(flower, probs = .75)
+  ### computes IQR
+  IQR <- Q3 - Q1
+  
+  ### classifies data as outliers if they exceed threshold of IQR
+  Outlier <- if_else((flower - Q3) > 1.5*IQR | (Q1 - flower)> 1.5*IQR,1,0 )
+  ### assigns outlier identifier to data set
+  dataset$Outlier <- Outlier
+  ### subsets data if not an outlier
+  Trimmeddata <- subset(dataset,dataset$Outlier == 0)
+  
+  ### return subset data
+  return(Trimmeddata)
+  
+}
+
+IrisNoOuts <- trim.CV(irisdata,irisdata$sepalW)
+
 
 ```
 
+```{r}
+
+print(sapply(irisdata, FUN = mean))
+
+listofmeans <- lapply(irisdata, FUN = mean)
+```
 
 
 
