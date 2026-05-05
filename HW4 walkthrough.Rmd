@@ -1,0 +1,153 @@
+---
+title: "HW4 walkthrough"
+output: pdf_document
+date: "2026-05-05"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+```{r}
+rm(list = ls())
+```
+
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+Some packages you might want
+Tidyverse (for both), ggplot2, magrittr, tidyr, dplyr, gghighlight
+
+```{r}
+require(tidyverse)
+require(ggplot2)
+require(magrittr)
+require(gghighlight)
+```
+
+
+
+```{r}
+Coviddf <- read.csv("https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/owid-covid-data.csv", header = TRUE)
+```
+
+```{r}
+
+```
+
+
+
+```{r}
+head(Coviddf)
+```
+
+```{r}
+### Filter observations to only include European nations
+
+
+DFeur <- filter(Coviddf, continent == 'Europe')
+### Filter observations to only include populations over 1 million
+DFpop <- filter(DFeur, population >= 1000000)
+
+```
+
+
+Work with dates 
+Lubridate is very good
+
+```{r}
+require(lubridate)
+```
+
+
+```{r}
+### duplicate date
+
+DFpop$date2 <- DFpop$date
+### use date to create month year day variables
+
+DFdate <- separate(DFpop,date, into = c('Year','Month','Day'), sep= '-')
+
+altdatesdf <- DFdate
+
+
+altdatesdf$asdate <- as_date(altdatesdf$date2)
+
+
+
+altdatesdf$asmonth <- month(altdatesdf$asdate)
+
+altdatesdf$asyear <- year(altdatesdf$asdate)
+
+DFdate$location <- as.factor(DFdate$location)
+### remove na values
+
+DFcomp <- filter(DFdate, !is.na(total_cases_per_million))
+DFcomp$monthlycases <- NA
+
+#We need to sum the cases per million over the years for each month
+
+
+
+
+### for April it is 15618050.024
+### for October it is 8886246.167
+### conditional sum to get cases per month for every year
+```
+
+
+```{r}
+### conditional sum to get cases per month for every year
+
+plotdata <- aggregate(DFcomp$total_cases_per_million, by=list(DFcomp$Month, DFcomp$location), FUN = sum)
+
+colnames(plotdata) <- c('Month','Location','Cases')
+
+
+### create a dummy variable if the country is in the 6 highest cases for April
+plotdata$AprilHigh <- ifelse(plotdata$Month == "04" & plotdata$Cases >= 15618050.024,1,0 )
+
+```
+
+
+now that we have the right data we can create our plot
+
+```{r}
+install.packages("gghighlight")  
+library(gghighlight)
+```
+
+
+```{r}
+### generate plot
+p <- ggplot(data = plotdata, mapping = aes(x = Month, y = Cases, group = Location,colour = Location)) + geom_line() + ylab("Cases per million ") + ggtitle("European COVID19 Monthly Case Rate") + gghighlight(max(AprilHigh) == 1, use_direct_label = FALSE)
+
+
+
+p + scale_y_continuous(trans = 'log2')
+```
+
+```{r}
+newplotdata <- filter(plotdata, AprilHigh == '1')
+
+
+```
+
