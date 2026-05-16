@@ -1,0 +1,233 @@
+---
+title: "hw 5 demo"
+output: html_document
+date: "2026-05-12"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+
+
+
+```{r}
+rm(list = ls())
+```
+
+
+Homework 5
+
+Read in the data
+
+```{r}
+setwd("C:\Users\ottenheimew\Desktop\examplefolder")
+```
+
+
+```{r}
+#read.csv()
+
+covidcountydf <- read.csv(file.choose(), header = TRUE)
+
+```
+
+
+```{r}
+### Look for the demographic county data stored on your pc
+uscntydemo <- read.csv(file.choose())
+```
+
+
+```{r}
+wbhdf <- read.csv(file.choose())
+
+wbccc <- read.csv(file.choose())
+```
+
+
+import the required packages (GGPLOT IS REALLY HELPFUL HERE)
+
+```{r}
+library(tidyverse)
+library(ggplot2)
+```
+
+combine data sets Use merge
+```{r}
+mergedcovid <- merge(covidcountydf,uscntydemo, by.x = "County", by.y = "County.name")
+
+
+```
+
+create new variables
+
+```{r}
+mergedcovid$caseperpop <- mergedcovid$Cases/mergedcovid$TotalPop
+mergedcovid$deathperpop <- mergedcovid$Deaths/mergedcovid$TotalPop
+mergedcovid$casepersnrs <- mergedcovid$Cases/mergedcovid$Pop.Over65
+```
+
+decreasing order
+```{r}
+
+#desc function is useful here
+
+decreasingdeathdf <- arrange(mergedcovid,desc(mergedcovid$deathperpop))
+```
+
+compare original and new df heads
+```{r}
+head(mergedcovid)
+```
+
+decreasing
+```{r}
+head(decreasingdeathdf)
+```
+
+Something doesn't add up how could there be more deaths than people?
+
+The issue is some states have the same county name.
+
+```{r}
+mergedcovid <- merge(covidcountydf, uscntydemo, by.x = c("County","State"), by.y = c("County.name","ST.Name"))
+```
+
+
+```{r}
+mergedcovid$caseperpop <- mergedcovid$Cases/mergedcovid$TotalPop
+mergedcovid$deathperpop <- mergedcovid$Deaths/mergedcovid$TotalPop
+mergedcovid$casepersnrs <- mergedcovid$Cases/mergedcovid$Pop.Over65
+```
+
+decreasing order
+```{r}
+
+#desc function is useful here
+decreasingdeathdf <- arrange(mergedcovid,desc(mergedcovid$deathperpop))
+```
+
+```{r}
+head(mergedcovid)
+```
+
+decreasing
+```{r}
+head(decreasingdeathdf)
+```
+```{r}
+print(mean(mergedcovid$deathperpop))
+```
+```{r}
+WBHDFcodeonly <- data.frame(wbhdf[,1])
+names(WBHDFcodeonly) <- c("code")
+```
+
+```{r}
+tidywbhdf <- WBHDFcodeonly %>%  
+  separate(col = code, into = c("group","subgroup","Measurement","units"), sep = "\\.", fill = "right", remove = FALSE) 
+```
+
+
+Is this tidy?
+
+Every variable is a column 
+Every observation is a row
+Each value is in one cell 
+
+Import Petal Data
+
+```{r}
+## ready plot data
+irisdf <- read.csv(file.choose(), header = FALSE)
+
+
+
+```
+
+```{r}
+library(ggplot2)
+```
+
+
+```{r}
+names(irisdf) <- c("sepalL","sepalW","petalL","petalw","class")
+```
+
+
+Box Plot
+
+```{r}
+### base function
+
+baseplot <- boxplot(irisdf$sepalW )
+baseplot
+print(summary(irisdf$sepalW))
+```
+```{r}
+plotlength <- ggplot(data = irisdf, aes(y = irisdf$sepalL)) + geom_boxplot()+ coord_cartesian() + ggtitle(label = "Sepal Length Box Plot")
+plotlength
+```
+
+```{r}
+### change axis dimensions
+plotlength <- ggplot(data = irisdf, aes(y = irisdf$sepalL)) + geom_boxplot()+ coord_cartesian(ylim = c(2,5))
+plotlength
+```
+
+
+
+```{r}
+plot1 <- ggplot(data = irisdf, aes(x = irisdf$class,y = irisdf$sepalW)) + geom_boxplot() + ylim(0,5) + ggtitle(label = "My boxplot") + xlab(label = "Iris Class") + ylab(label = "Length in CM") + geom_jitter()
+
+plot1
+```
+
+
+Histograms
+
+```{r}
+basehist <- hist(irisdf$sepalW)
+
+basehist
+```
+```{r}
+gghist <- ggplot(data = irisdf, aes(x = irisdf$sepalL)) + geom_histogram(binwidth = .09 , color = "Green") + ggtitle(label = "My Histogram")
+
+gghist
+```
+
+```{r}
+gghist <- ggplot(data = irisdf, aes(x = irisdf$sepalL, shape = factor)) + geom_histogram(binwidth = .11 , color = "Green") + geom_freqpoly() + ggtitle(label = "My Histogram")
+
+gghist
+```
+
+```{r}
+gghist <- ggplot(data = irisdf, aes(x = irisdf$sepalL)) + geom_histogram(binwidth = .2 , color = "Green") + geom_density()  + ggtitle(label = "My Histogram")
+
+gghist
+```
+
+
+```{r}
+irisdf$factor <- as.factor(irisdf$class)
+```
+
+```{r}
+classplot <- ggplot(data = irisdf, mapping = aes(fill = factor, x = sepalW)) + geom_histogram(binwidth = .15, color = "black")+facet_wrap(~irisdf$factor) + geom_freqpoly()
+
+classplot
+```
+
