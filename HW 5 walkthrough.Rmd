@@ -22,7 +22,7 @@ summary(cars)
 
 
 ```{r}
-rm(list = ls())
+#rm(list = ls())
 ```
 
 
@@ -130,10 +130,15 @@ head(decreasingdeathdf)
 print(mean(mergedcovid$deathperpop))
 ```
 ```{r}
+Healthdf <- read.csv(file.choose())
+```
+
+Separate is Useful
+```{r}
 WBHDFcodeonly <- data.frame(wbhdf[,1])
 names(WBHDFcodeonly) <- c("code")
 ```
-
+Old code not for HW 5 but helps teach you separate
 ```{r}
 tidywbhdf <- WBHDFcodeonly %>%  
   separate(col = code, into = c("group","subgroup","Measurement","units"), sep = "\\.", fill = "right", remove = FALSE) 
@@ -143,8 +148,53 @@ tidywbhdf <- WBHDFcodeonly %>%
 Is this tidy?
 
 Every variable is a column 
+
 Every observation is a row
+
 Each value is in one cell 
+
+
+As is the health data is not tidy. We have one column that represents multiple variables
+
+To resolve this we use "Pivot Wider"
+```{r}
+#### Reduce df to only codes
+Healthdf <- as.data.frame(Healthdf[,c(2,4,5,6)])
+
+```
+
+Introducing Pivot Wider
+
+
+```{r}
+tidyhealthdf <- Healthdf %>% pivot_wider(id_cols = c(country_code,year), names_from = indicator_code, values_from = value)
+```
+
+```{r}
+head(tidyhealthdf)
+```
+
+Finding the 11 least NA variables
+
+
+```{r}
+nadf <- apply(is.na(tidyhealthdf), MARGIN = 2,sum)
+
+
+nadf <- as.data.frame(nadf)
+
+orderedna <- nadf[order(nadf$nadf),]
+
+head(orderedna)
+```
+```{r}
+arrangeddf <- nadf %>% 
+  rownames_to_column(var =  "variable") %>%
+  arrange(nadf)
+
+head(arrangeddf)
+```
+
 
 Import Petal Data
 
