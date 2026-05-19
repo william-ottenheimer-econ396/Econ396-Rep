@@ -145,9 +145,4 @@ p <- ggplot(data = plotdata, mapping = aes(x = Month, y = Cases, group = Locatio
 p + scale_y_continuous(trans = 'log2')
 ```
 
-```{r}
-newplotdata <- filter(plotdata, AprilHigh == '1')
-
-
-```
 
