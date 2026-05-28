@@ -1,0 +1,368 @@
+---
+title: "HW 6 example"
+output: html_document
+date: "2026-05-20"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+#rm(list = ls())
+```
+
+
+```{r}
+install.packages(c("sf", "ggplot2", "ggspatial", "tidycensus", "tmap"))
+```
+
+
+
+## Question 1
+
+```{r}
+## ready plot data
+irisdf <- read.csv(file.choose(), header = FALSE)
+
+```
+
+```{r}
+names(irisdf) <- c("sepalL","sepalW","petalL","petalw","class")
+```
+
+
+```{r}
+library(ggplot2)
+
+
+```
+
+```{r}
+##base r scatter plot
+basescatter <- plot(x = irisdf$sepalW, y = irisdf$sepalL)
+
+basescatter
+```
+
+
+```{r}
+### part b
+ggscatter <- ggplot(data = irisdf, aes(x = petalw, y = sepalW)) + geom_point() +  
+  labs( title    = "Iris Petal Width by Sepal Width",subtitle = "Scatterplot"  ) + xlab(label = "Petal Width") + ylab(label = "Sepal Width") 
+
+ggscatter
+```
+
+
+
+
+
+
+```{r}
+### part c
+ggscatterclass <- ggplot(data = irisdf, aes(x = petalw, y = sepalW, colour = class)) + geom_point(shape = 4 ) +  
+  labs( title    = "Iris Petal Width by Sepal Width",subtitle = "Scatterplot"  ) + xlab(label = "Petal Width") + ylab(label = "Sepal Width") 
+
+ggscatterclass
+```
+
+
+## Question 2
+
+```{r}
+###Pairs Plot part a
+basepair <- pairs(irisdf[,c(1,2,3,4)])
+basepair
+```
+
+```{r}
+#install.packages("GGally")
+
+library(GGally)
+```
+
+
+```{r}
+###part b
+ggpairplot <- ggpairs(data = irisdf, columns = c(1:4), title = "Iris Data")
+
+ggpairplot
+```
+
+
+```{r}
+###part 3 scatter matrix w/ group color
+Colorpairs <- ggpairs(irisdf, columns = c(1:4), title = "Iris Data Colored by Group", progress = F, aes(colour = class))
+
+Colorpairs
+
+```
+The results indicate that Iris class is an important factor that contributes to sepal and petal metrics.
+
+## Question 3
+
+```{r}
+install.packages(c("sf", "ggplot2", "ggspatial", "tidycensus", "tmap"))
+```
+
+```{r}
+library(tidycensus)
+library(ggspatial)
+```
+
+
+```{r}
+library(sf)
+```
+
+
+
+```{r}
+install.packages(c("tidycensus", "sf", "ggplot2", "tmap", "patchwork", "dplyr"))
+```
+
+
+```{r load-packages}
+library(tidycensus)   # Download Census data + shapefiles
+library(sf)           # Work with spatial (map) data
+library(ggplot2)      # General plotting
+library(tmap)         # Map-specific plotting
+library(patchwork)    # Arrange multiple plots side by side
+library(dplyr)        # Data wrangling
+```
+
+
+
+1. Go to <https://api.census.gov/data/key_signup.html>
+2. Enter your name and email — your key will be emailed to you
+3. Paste it below (replace `"YOUR_KEY_HERE"` with your actual key):
+
+```{r api-key, eval=FALSE}
+#census_api_key("9b10e3a9e84e4a04fcb19c024f8efe3c4376daed", install = TRUE, overwrite = TRUE)
+# After running this once, restart R and you won't need to run it again
+```
+
+
+
+The American Community Survey 5-year estimates (`acs5`) are the most reliable
+for county-level data.
+
+```{r browse-variables, eval=FALSE}
+# Load the variable list for the 2024 5-year ACS
+acs_vars <- load_variables(2024, "acs5", cache = TRUE)
+
+
+
+#View(acs_vars)
+
+```
+
+
+
+
+**Commonly used variable codes:**
+
+| Variable Code | What it measures |
+|---------------|-----------------|
+| `B19013_001`  | Median household income |
+| `B15003_022`  | Bachelor's degree holders (count) |
+| `B01003_001`  | Total population |
+| `B17001_002`  | Population below poverty level |
+| `B08303_001`  | Travel time to work |
+
+
+`get_acs()` downloads both the data **and** the county boundary shapes in one step.
+The key arguments are:
+
+- `geography`: level of geography (`"county"`, `"state"`, `"tract"`, etc.)
+- `variables`: the variable code(s) you want
+- `state`: filter to one state (use 2-letter abbreviation)
+- `year`: which ACS year (2022 is the most recent stable release)
+- `geometry = TRUE`: this is what adds the map shapes!
+
+```{r}
+# Download median household income by county for Washington State
+income_data <- get_acs(
+  geography = "county",
+  variables = "B19013_001",   # Median household income
+  state     = "WA",           
+  year      = 2024,
+  geometry  = TRUE            # Includes county boundary shapefiles
+)
+
+# Preview the data
+head(income_data)
+```
+
+What do the columns mean?
+
+- `GEOID`: unique identifier for each county
+- `NAME`: county name
+- `variable`: the variable code you requested
+- `estimate`: the actual value (e.g., median income in dollars)
+- `moe`: margin of error
+- `geometry`: the map shape for each county
+
+```{r}
+library(tidyverse)
+```
+
+
+```{r}
+# Download a second variable
+
+education_data <- get_acs(
+  geography = "county",
+  variables = c(
+    bachelors = "B15003_022",   # Count: bachelor's degree
+    total_pop = "B15003_001"    # Count: total adults 25+
+  ),
+  state    = "WA",
+  year     = 2024,
+  geometry = TRUE
+)
+
+# The data comes in "long" format (one row per variable per county).
+# We need to reshape it to "wide" format and calculate a percentage.
+# A normal pivot wide won't work because the sf package overrides traditional subsetting operators
+copyedu <- education_data
+
+geometryonly <- copyedu[,-c(2:5)]
+
+education_data <- st_drop_geometry(education_data)
+
+education_wide <- pivot_wider(data =  education_data, id_cols = "GEOID"  , names_from = "variable", values_from = "estimate" )
+
+completeEducation <- education_wide %>% 
+  left_join(geometryonly, by = "GEOID") %>%
+  st_as_sf()
+
+
+ 
+completeEducation$pcteducated <- ( completeEducation$bachelors/completeEducation$total_pop ) *100
+
+```
+
+```{r}
+
+Myage <- get_acs(geography = "county", variables = c(M25 = "B01001G_009"),
+                       year = 2024, state = 'WA' , geometry  = TRUE
+                        )
+```
+
+
+
+
+## Begin Visuals
+
+```{r}
+### first map
+map_income <- ggplot(data = income_data) +
+  geom_sf(aes(fill = estimate), color = "white", size = 0.2) +
+  scale_fill_viridis_c(
+    option = "viridis",
+    labels = scales::dollar,     # Format numbers as $XX,XXX
+    name   = "Median Income"
+  ) +
+  labs(
+    title    = "Median Household Income by County",
+    subtitle = "Washington State, 2024 ACS 5-Year Estimates",
+    caption  = "Source: U.S. Census Bureau via tidycensus"
+  ) +
+  theme_void() +                 # Clean look — removes axes/grid
+  theme(
+    plot.title    = element_text(face = "bold", size = 14),
+    plot.subtitle = element_text(size = 10),
+    legend.position = "bottom"
+  )
+
+map_income
+```
+
+
+
+```{r}
+###second map
+map_education <- ggplot(data = completeEducation) +
+  geom_sf(aes(fill = pcteducated), color = "white", size = 0.2) +
+  scale_fill_viridis_c(
+    option = "mako",
+    labels = function(x) paste0(round(x, 1), "%"),
+    name   = "% Bachelor's+"
+  ) +
+  labs(
+    title    = "Adults with Bachelor's Degree or Higher",
+    subtitle = "Washington State, 2024 ACS 5-Year Estimates",
+    caption  = "Source: U.S. Census Bureau via tidycensus"
+  ) +
+  theme_void() +
+  theme(
+    plot.title    = element_text(face = "bold", size = 14),
+    plot.subtitle = element_text(size = 10),
+    legend.position = "bottom"
+  ) 
+
+map_education
+```
+```{r}
+map_m25 <- ggplot(data = Myage) +
+  geom_sf(aes(fill = estimate), color = "white", size = 0.2) +
+  scale_fill_viridis_c(
+    option = "plasma",
+    name   = "Count Men 25-29"
+  ) +
+  labs(
+    title    = "Population of Guys My Age by County",
+    subtitle = "Washington State, 2024 ACS 5-Year Estimates",
+    caption  = "Source: U.S. Census Bureau via tidycensus"
+  ) +
+  theme_void() +                 # Clean look — removes axes/grid
+  theme(
+    plot.title    = element_text(face = "bold", size = 14),
+    plot.subtitle = element_text(size = 10),
+    legend.position = "bottom"
+  )
+map_m25
+```
+
+
+
+
+
+```{r}
+### side by side 
+map_income + map_education + map_m25
+```
+
+
+
+`tmap` can make interactive maps your readers can zoom and hover on:
+
+```{r}
+tmap_mode("view")  
+
+tm_shape(income_data) +
+  tm_polygons(
+    col         = "estimate",
+    palette     = "plasma",
+    title       = "Median Household Income",
+    popup.vars  = c("County" = "NAME", "Income" = "estimate")
+  )
+```
+
+
+```{r}
+library(tmap)
+
+tmap_mode("plot")
+
+map1 <- tm_shape
+```
+
